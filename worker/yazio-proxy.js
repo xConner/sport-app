@@ -35,7 +35,7 @@ export default {
     // Lesende Abfragen
     if (req.method === 'GET' && READ_PATHS.some(p => p.test(url.pathname))) {
       const auth = req.headers.get('Authorization') || '';
-      if (!/^Bearer [\w.-]+$/.test(auth)) return new Response('no token', { status: 401, headers: cors });
+      if (!/^Bearer \S+$/.test(auth)) return new Response('no token', { status: 401, headers: cors });
       const r = await fetch(API + url.pathname + url.search, { headers: { Authorization: auth, Accept: 'application/json' } });
       return new Response(await r.text(), { status: r.status, headers: { ...cors, 'Content-Type': 'application/json' } });
     }
