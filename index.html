@@ -85,6 +85,16 @@
     <div id="history"></div>
   </section>
 
+  <!-- MENSA -->
+  <section id="view-mensa" class="view">
+    <div class="mensa-head">
+      <span class="seg" id="mensasel"></span>
+      <span class="hint" id="mensaupd"></span>
+    </div>
+    <div class="days" id="mensadays"></div>
+    <div id="mensa"></div>
+  </section>
+
   <!-- EINSTELLUNGEN -->
   <section id="view-settings" class="view">
     <form id="settings" class="settings">
@@ -156,6 +166,7 @@
   <button data-view="today" class="on"><span>●</span>Heute</button>
   <button data-view="plan"><span>◎</span>Plan</button>
   <button data-view="history"><span>▤</span>Verlauf</button>
+  <button data-view="mensa"><span>🍽</span>Mensa</button>
   <button data-view="settings"><span>⚙</span>Mehr</button>
 </nav>
 
@@ -185,6 +196,7 @@
 </dialog>
 
 <script src="app.js"></script>
+<script src="mensa.js"></script>
 <script type="module" src="sync.js"></script>
 </body>
 </html>

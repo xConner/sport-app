@@ -124,7 +124,7 @@ tr.today td { font-weight: 700; }
 
 /* Tabs */
 .tabs {
-  position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; display: grid; grid-template-columns: repeat(4, 1fr);
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; display: grid; grid-template-columns: repeat(5, 1fr);
   background: var(--surface); border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom);
 }
 .tabs button { background: none; border: 0; border-radius: 0; padding: 8px 0 10px; color: var(--muted); font-size: 12px; display: grid; gap: 2px; }
@@ -147,3 +147,19 @@ dialog h3 { margin: 0; }
   .cards { grid-template-columns: repeat(3, 1fr); }
   .presets { grid-template-columns: repeat(6, 1fr); }
 }
+
+/* Mensa */
+.mensa-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+.mensa-head .seg button { padding: 8px 14px; font-size: 14px; }
+.days { display: flex; gap: 6px; overflow-x: auto; padding: 12px 0 4px; scrollbar-width: none; }
+.days button { flex: 0 0 auto; padding: 8px 12px; font-size: 14px; }
+.days button.on { background: var(--accent); color: var(--accent-ink); border-color: transparent; font-weight: 700; }
+.meal { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px; margin-bottom: 8px; }
+.meal .top2 { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
+.meal .n { font-weight: 600; line-height: 1.3; }
+.meal .p { font-variant-numeric: tabular-nums; white-space: nowrap; font-weight: 700; }
+.meal .tags { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px; }
+.tag { font-size: 12px; padding: 2px 8px; border-radius: 99px; background: var(--surface2); color: var(--muted); }
+.tag.vegan { background: color-mix(in srgb, var(--accent) 22%, transparent); color: var(--text); }
+.tag.vegetarisch { background: color-mix(in srgb, var(--accent) 12%, transparent); color: var(--text); }
+.toast[hidden] { display: none; }
