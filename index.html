@@ -23,6 +23,7 @@
   <!-- HEUTE -->
   <section id="view-today" class="view active">
     <div id="progress" class="cards"></div>
+    <div id="yazio" class="yazio" hidden></div>
 
     <h2>Schnell eintragen</h2>
     <div id="presets" class="presets"></div>
@@ -152,6 +153,17 @@
       </div>
     </div>
 
+    <h2>Yazio</h2>
+    <div class="custom">
+      <p class="hint" id="yaziostatus"></p>
+      <form id="yazioform" class="row" hidden autocomplete="off">
+        <input name="email" type="email" placeholder="Yazio-E-Mail" required autocomplete="off">
+        <input name="password" type="password" placeholder="Yazio-Passwort" required autocomplete="new-password">
+        <button type="submit" class="primary">Mit Yazio verbinden</button>
+      </form>
+      <div id="yazioconn" hidden><button type="button" id="yazioout">Yazio trennen</button></div>
+    </div>
+
     <h2>Daten</h2>
     <div class="row two">
       <button type="button" id="export">Backup exportieren</button>
@@ -197,6 +209,8 @@
 
 <script src="app.js"></script>
 <script src="mensa.js"></script>
+<script src="yazio-config.js"></script>
+<script src="yazio.js"></script>
 <script type="module" src="sync.js"></script>
 </body>
 </html>

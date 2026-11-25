@@ -163,3 +163,4 @@ dialog h3 { margin: 0; }
 .tag.vegan { background: color-mix(in srgb, var(--accent) 22%, transparent); color: var(--text); }
 .tag.vegetarisch { background: color-mix(in srgb, var(--accent) 12%, transparent); color: var(--text); }
 .toast[hidden] { display: none; }
+.yazio { margin-top: 10px; }
