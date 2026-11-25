@@ -121,6 +121,27 @@
       <button type="submit" class="primary">Nachtragen</button>
     </form>
 
+    <h2>Konto &amp; Sync</h2>
+    <div id="account" class="custom">
+      <p class="hint" id="syncstatus">Sync wird geladen …</p>
+      <form id="login" hidden>
+        <button type="button" id="google">Mit Google anmelden</button>
+        <p class="hint">oder mit E-Mail und Passwort:</p>
+        <input name="email" type="email" autocomplete="username" placeholder="E-Mail" required>
+        <input name="password" type="password" autocomplete="current-password" placeholder="Passwort (min. 6 Zeichen)" minlength="6" required>
+        <div class="row two">
+          <button type="submit" value="login">Anmelden</button>
+          <button type="submit" value="signup">Konto erstellen</button>
+        </div>
+      </form>
+      <div id="loggedin" hidden>
+        <div class="row two">
+          <button type="button" id="syncnow">Jetzt synchronisieren</button>
+          <button type="button" id="logout">Abmelden</button>
+        </div>
+      </div>
+    </div>
+
     <h2>Daten</h2>
     <div class="row two">
       <button type="button" id="export">Backup exportieren</button>
@@ -164,5 +185,6 @@
 </dialog>
 
 <script src="app.js"></script>
+<script type="module" src="sync.js"></script>
 </body>
 </html>

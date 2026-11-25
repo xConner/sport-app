@@ -1,5 +1,5 @@
 'use strict';
-const VERSION = '0.1.0';
+const VERSION = '0.2.0';
 
 /* ---------- Hilfen ---------- */
 const $ = (s, r = document) => r.querySelector(s);
@@ -33,6 +33,7 @@ const DEFAULTS = {
     updatedAt: 0,
   },
   entries: {},
+  synced: {}, // id -> updatedAt, das zuletzt erfolgreich in die Cloud ging ('settings' für Einstellungen)
 };
 
 function load() {
@@ -40,7 +41,7 @@ function load() {
     const raw = localStorage.getItem(KEY);
     if (raw) {
       const d = JSON.parse(raw);
-      return { settings: { ...DEFAULTS.settings, ...d.settings, goals: { ...DEFAULTS.settings.goals, ...(d.settings || {}).goals } }, entries: d.entries || {} };
+      return { settings: { ...DEFAULTS.settings, ...d.settings, goals: { ...DEFAULTS.settings.goals, ...(d.settings || {}).goals } }, entries: d.entries || {}, synced: d.synced || {} };
     }
   } catch (e) { console.warn('load failed', e); }
   return structuredClone(DEFAULTS);
@@ -396,6 +397,37 @@ async function storageInfo() {
   } catch {}
   $('#storageinfo').textContent = txt;
 }
+
+/* ---------- Schnittstelle für den Cloud-Sync (sync.js) ---------- */
+window.SportStore = {
+  get db() { return db; },
+  // Änderungen aus der Cloud übernehmen (Last-Write-Wins über updatedAt)
+  mergeRemote({ entries = [], settings = null }) {
+    let changed = false;
+    for (const r of entries) {
+      const cur = db.entries[r.id];
+      if (!cur || (r.updatedAt || 0) > (cur.updatedAt || 0)) { db.entries[r.id] = r; changed = true; }
+      if (db.entries[r.id].updatedAt === r.updatedAt) db.synced[r.id] = r.updatedAt;
+    }
+    if (settings && (settings.updatedAt || 0) > (db.settings.updatedAt || 0)) {
+      db.settings = { ...db.settings, ...settings, goals: { ...db.settings.goals, ...settings.goals } }; changed = true; fillSettings();
+    }
+    if (settings && settings.updatedAt === db.settings.updatedAt) db.synced.settings = settings.updatedAt;
+    try { localStorage.setItem(KEY, JSON.stringify(db)); } catch {}
+    if (changed) window.dispatchEvent(new Event('data-changed'));
+  },
+  pending() {
+    const list = Object.values(db.entries).filter(e => db.synced[e.id] !== e.updatedAt);
+    const settings = db.synced.settings !== db.settings.updatedAt ? db.settings : null;
+    return { entries: list, settings };
+  },
+  markSynced(ids, settingsTs) {
+    for (const [id, ts] of ids) db.synced[id] = ts;
+    if (settingsTs != null) db.synced.settings = settingsTs;
+    try { localStorage.setItem(KEY, JSON.stringify(db)); } catch {}
+  },
+  toast: (...a) => toast(...a),
+};
 
 /* ---------- Start ---------- */
 fillSettings(); updateRunHint(); net(); renderAll(); storageInfo();
