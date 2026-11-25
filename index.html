@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Challenge-Tracker</title>
+<meta name="theme-color" content="#0f1115">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Challenge">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <h1 id="title">Challenge 2026</h1>
+  <span id="net" class="net" title="Verbindungsstatus"></span>
+</header>
+
+<main>
+  <!-- HEUTE -->
+  <section id="view-today" class="view active">
+    <div id="progress" class="cards"></div>
+
+    <h2>Schnell eintragen</h2>
+    <div id="presets" class="presets"></div>
+
+    <h2>Eigener Satz</h2>
+    <form id="custom" class="custom" autocomplete="off">
+      <div class="row">
+        <label>Klimmzüge</label>
+        <div class="stepper" data-field="pullups">
+          <button type="button" data-d="-5">−5</button><button type="button" data-d="-1">−1</button>
+          <input type="number" inputmode="numeric" min="0" step="1" name="pullups" value="0">
+          <button type="button" data-d="1">+1</button><button type="button" data-d="5">+5</button>
+        </div>
+      </div>
+      <div class="row">
+        <label>Liegestütze</label>
+        <div class="stepper" data-field="pushups">
+          <button type="button" data-d="-5">−5</button><button type="button" data-d="-1">−1</button>
+          <input type="number" inputmode="numeric" min="0" step="1" name="pushups" value="0">
+          <button type="button" data-d="1">+1</button><button type="button" data-d="5">+5</button>
+        </div>
+      </div>
+      <div class="row">
+        <label>Laufen
+          <span class="seg" id="runmode">
+            <button type="button" data-mode="laps" class="on">Runden</button><button type="button" data-mode="km">km</button>
+          </span>
+        </label>
+        <div class="stepper" data-field="run">
+          <button type="button" data-d="-1">−1</button>
+          <input type="number" inputmode="decimal" min="0" step="any" name="run" value="0">
+          <button type="button" data-d="1">+1</button>
+        </div>
+        <small id="runhint" class="hint"></small>
+      </div>
+      <details class="when">
+        <summary>Anderer Tag / Uhrzeit (Nachtragen)</summary>
+        <div class="row two">
+          <input type="date" name="date">
+          <input type="time" name="time">
+        </div>
+        <input type="text" name="note" placeholder="Notiz (optional)" maxlength="140">
+      </details>
+      <button type="submit" class="primary">Satz speichern</button>
+    </form>
+
+    <h2 id="daytitle">Heute</h2>
+    <div id="daytotals" class="daytotals"></div>
+    <ul id="daylog" class="log"></ul>
+  </section>
+
+  <!-- PLAN -->
+  <section id="view-plan" class="view">
+    <div id="plan"></div>
+  </section>
+
+  <!-- VERLAUF -->
+  <section id="view-history" class="view">
+    <div id="chart" class="chart"></div>
+    <div id="history"></div>
+  </section>
+
+  <!-- EINSTELLUNGEN -->
+  <section id="view-settings" class="view">
+    <form id="settings" class="settings">
+      <h2>Challenge</h2>
+      <label>Name <input name="name" type="text" maxlength="40"></label>
+      <div class="row two">
+        <label>Start <input name="start" type="date"></label>
+        <label>Ende <input name="end" type="date"></label>
+      </div>
+      <div class="row three">
+        <label>Klimmzüge <input name="g_pullups" type="number" inputmode="numeric" min="0"></label>
+        <label>Liegestütze <input name="g_pushups" type="number" inputmode="numeric" min="0"></label>
+        <label>Laufen km <input name="g_km" type="number" inputmode="decimal" min="0" step="any"></label>
+      </div>
+      <label>Rundenlänge (m) <input name="lap" type="number" inputmode="numeric" min="50" step="1"></label>
+
+      <h2>Schnell-Buttons</h2>
+      <p class="hint">Eine Zeile pro Button: Klimmzüge, Liegestütze, Runden. Beispiel: <code>10,20,0</code></p>
+      <textarea name="presets" rows="7"></textarea>
+      <button type="submit" class="primary">Speichern</button>
+    </form>
+
+    <h2>Bisherigen Stand nachtragen</h2>
+    <p class="hint">Trag hier ein, was du vor der App schon gemacht hast. Am besten pro Tag (dann stimmt der Verlauf), oder alles als eine Summe an einem Tag.</p>
+    <form id="backfill" class="custom">
+      <div class="row two">
+        <label>Tag <input name="date" type="date" required></label>
+        <label>Laufen km <input name="km" type="number" inputmode="decimal" min="0" step="any" value="0"></label>
+      </div>
+      <div class="row two">
+        <label>Klimmzüge <input name="pullups" type="number" inputmode="numeric" min="0" value="0"></label>
+        <label>Liegestütze <input name="pushups" type="number" inputmode="numeric" min="0" value="0"></label>
+      </div>
+      <button type="submit" class="primary">Nachtragen</button>
+    </form>
+
+    <h2>Daten</h2>
+    <div class="row two">
+      <button type="button" id="export">Backup exportieren</button>
+      <label class="btn">Backup importieren<input type="file" id="import" accept="application/json" hidden></label>
+    </div>
+    <p class="hint" id="storageinfo"></p>
+    <p class="hint">Version <span id="ver"></span></p>
+  </section>
+</main>
+
+<nav class="tabs">
+  <button data-view="today" class="on"><span>●</span>Heute</button>
+  <button data-view="plan"><span>◎</span>Plan</button>
+  <button data-view="history"><span>▤</span>Verlauf</button>
+  <button data-view="settings"><span>⚙</span>Mehr</button>
+</nav>
+
+<div id="toast" class="toast" hidden></div>
+
+<dialog id="edit">
+  <form method="dialog" id="editform">
+    <h3>Eintrag bearbeiten</h3>
+    <div class="row two">
+      <label>Klimmzüge <input name="pullups" type="number" inputmode="numeric" min="0"></label>
+      <label>Liegestütze <input name="pushups" type="number" inputmode="numeric" min="0"></label>
+    </div>
+    <div class="row two">
+      <label>Laufen km <input name="km" type="number" inputmode="decimal" min="0" step="any"></label>
+      <label>Notiz <input name="note" type="text" maxlength="140"></label>
+    </div>
+    <div class="row two">
+      <label>Tag <input name="date" type="date"></label>
+      <label>Uhrzeit <input name="time" type="time"></label>
+    </div>
+    <div class="row three">
+      <button value="delete" class="danger">Löschen</button>
+      <button value="cancel">Abbrechen</button>
+      <button value="save" class="primary">Speichern</button>
+    </div>
+  </form>
+</dialog>
+
+<script src="app.js"></script>
+</body>
+</html>
