@@ -1,6 +1,6 @@
 # Sport-App
 
-Persönliche, offline-fähige Sport-App (PWA). Erstes Feature: Challenge-Tracker
+Persönliche, offline-fähige Sport-App „Sport“ (PWA). Bereiche: Challenge
 (Klimmzüge, Liegestütze, Laufen in 400-m-Runden) mit Tagesübersicht, Restmenge und Tagessoll.
 
 - Läuft ohne Build-Schritt: `index.html`, `app.js`, `style.css`, `sw.js`

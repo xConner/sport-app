@@ -1,5 +1,5 @@
 'use strict';
-const VERSION = '0.4.2';
+const VERSION = '0.5.0';
 
 /* ---------- Hilfen ---------- */
 const $ = (s, r = document) => r.querySelector(s);
@@ -114,7 +114,7 @@ let runMode = 'laps';
 
 function renderProgress() {
   const st = stats(), s = db.settings;
-  $('#title').textContent = s.name;
+  $('#challengename').textContent = s.name;
   $('#progress').innerHTML = EX.map(x => {
     const p = st.per[x.k], diff = p.total - p.expected;
     const ceil = v => x.k === 'km' ? fmtKm(Math.ceil(v * 10) / 10) + ' km' : fmt(Math.ceil(v));
