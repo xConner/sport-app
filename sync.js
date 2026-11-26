@@ -7,6 +7,10 @@ const V = '11.0.2';
 const $ = s => document.querySelector(s);
 const status = t => { $('#syncstatus').textContent = t; };
 const Store = window.SportStore;
+// Firestore kann keine Arrays in Arrays speichern (Schnell-Buttons sind [[KZ, LS, Runden], ...]),
+// darum werden die Presets als Text gespeichert und beim Laden zurückverwandelt.
+const settingsOut = s => ({ ...s, presets: JSON.stringify(s.presets || []) });
+const settingsIn = s => { try { return { ...s, presets: typeof s.presets === 'string' ? JSON.parse(s.presets) : s.presets }; } catch { const { presets, ...rest } = s; return rest; } };
 
 if (!firebaseConfig) {
   status('Sync ist noch nicht eingerichtet. Deine Daten bleiben auf diesem Gerät.');
@@ -46,7 +50,7 @@ async function start() {
           const b = F.writeBatch(fs);
           for (const e of chunk) b.set(F.doc(fs, 'users', user.uid, 'entries', e.id), e);
           const s = i === 0 ? settings : null;
-          if (s) b.set(F.doc(fs, 'users', user.uid, 'meta', 'settings'), s);
+          if (s) b.set(F.doc(fs, 'users', user.uid, 'meta', 'settings'), settingsOut(s));
           await b.commit(); // wartet offline, bis der Server bestätigt
           Store.markSynced(chunk.map(e => [e.id, e.updatedAt]), s ? s.updatedAt : null);
           if (!entries.length) break;
@@ -68,7 +72,7 @@ async function start() {
       push();
     }, e => status('Sync-Fehler: ' + e.message)));
     unsub.push(F.onSnapshot(F.doc(fs, 'users', u.uid, 'meta', 'settings'), d => {
-      if (d.exists()) Store.mergeRemote({ settings: d.data() });
+      if (d.exists()) Store.mergeRemote({ settings: settingsIn(d.data()) });
     }, () => {}));
   });
 

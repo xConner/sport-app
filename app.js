@@ -1,5 +1,5 @@
 'use strict';
-const VERSION = '0.4.1';
+const VERSION = '0.4.2';
 
 /* ---------- Hilfen ---------- */
 const $ = (s, r = document) => r.querySelector(s);
