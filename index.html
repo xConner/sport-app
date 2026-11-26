@@ -119,7 +119,23 @@
       <button type="submit" class="primary">Speichern</button>
     </form>
 
-    <h2>Bisherigen Stand nachtragen</h2>
+    <h2>Alten Gesamtstand verteilen</h2>
+    <p class="hint">Für alles, was du vor der App gemacht hast, aber keinem Tag mehr zuordnen kannst: Die Summe wird gleichmäßig auf die Tage im Zeitraum verteilt. Erneutes Verteilen ersetzt die vorherige Verteilung.</p>
+    <form id="spread" class="custom">
+      <div class="row three">
+        <label>Klimmzüge <input name="pullups" type="number" inputmode="numeric" min="0" value="0"></label>
+        <label>Liegestütze <input name="pushups" type="number" inputmode="numeric" min="0" value="0"></label>
+        <label>Laufen km <input name="km" type="number" inputmode="decimal" min="0" step="any" value="0"></label>
+      </div>
+      <div class="row two">
+        <label>Von <input name="from" type="date" required></label>
+        <label>Bis <input name="to" type="date" required></label>
+      </div>
+      <p class="hint" id="spreadhint"></p>
+      <button type="submit" class="primary">Gleichmäßig verteilen</button>
+    </form>
+
+    <h2>Einzelnen Tag nachtragen</h2>
     <p class="hint">Trag hier ein, was du vor der App schon gemacht hast. Am besten pro Tag (dann stimmt der Verlauf), oder alles als eine Summe an einem Tag.</p>
     <form id="backfill" class="custom">
       <div class="row two">

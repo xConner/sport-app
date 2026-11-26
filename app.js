@@ -1,5 +1,5 @@
 'use strict';
-const VERSION = '0.5.0';
+const VERSION = '0.6.0';
 
 /* ---------- Hilfen ---------- */
 const $ = (s, r = document) => r.querySelector(s);
@@ -334,6 +334,49 @@ sf.addEventListener('submit', ev => {
     lap: Math.max(50, +sf.lap.value || 400), presets: presets.length ? presets : DEFAULTS.settings.presets, updatedAt: Date.now() };
   persist(); fillSettings(); toast('Einstellungen gespeichert');
 });
+/* Alten Gesamtstand gleichmäßig auf Tage verteilen (ganze Zahlen, km auf 0,1 genau; Summen stimmen exakt) */
+const SPREAD_NOTE = 'Altstand (verteilt)';
+function splitEven(total, n) { const base = Math.floor(total / n), rest = total - base * n; return Array.from({ length: n }, (_, i) => base + (i < rest ? 1 : 0)); }
+function spreadTotals({ pullups, pushups, km, from, to }) {
+  const days = []; for (let d = from; d <= to; d = addDays(d, 1)) days.push(d);
+  if (!days.length) return 0;
+  const pu = splitEven(Math.round(pullups), days.length), ps = splitEven(Math.round(pushups), days.length), k = splitEven(Math.round(km * 10), days.length);
+  const now = Date.now();
+  for (const e of Object.values(db.entries)) if (!e.deleted && e.note === SPREAD_NOTE) db.entries[e.id] = { ...e, deleted: true, updatedAt: now };
+  days.forEach((d, i) => {
+    if (!pu[i] && !ps[i] && !k[i]) return;
+    const id = uid();
+    db.entries[id] = { id, date: d, time: '00:00', pullups: pu[i], pushups: ps[i], km: k[i] / 10, note: SPREAD_NOTE, updatedAt: now, deleted: false };
+  });
+  persist(); return days.length;
+}
+const sp = $('#spread');
+function firstTrackedDay() {
+  const d = live().filter(e => !/^Altstand|^nachgetragen/.test(e.note || '')).map(e => e.date).sort()[0];
+  return d || todayStr();
+}
+function fillSpread() {
+  sp.from.value = db.settings.start;
+  sp.to.value = addDays(firstTrackedDay(), -1);
+  const m = location.hash.match(/altstand=([\d.]+),([\d.]+),([\d.]+)/);
+  if (m) { sp.pullups.value = m[1]; sp.pushups.value = m[2]; sp.km.value = m[3]; }
+  spreadHint();
+}
+function spreadHint() {
+  const n = sp.from.value && sp.to.value && sp.to.value >= sp.from.value ? dayDiff(sp.from.value, sp.to.value) + 1 : 0;
+  $('#spreadhint').textContent = n ? `${n} Tage (${dayLabel(sp.from.value)} bis ${dayLabel(sp.to.value)}): pro Tag ca. ${fmt(+sp.pullups.value / n, 0)} KZ, ${fmt(+sp.pushups.value / n, 0)} LS, ${fmt(+sp.km.value / n, 1)} km` : 'Zeitraum prüfen';
+}
+sp.addEventListener('input', spreadHint);
+sp.addEventListener('submit', ev => {
+  ev.preventDefault();
+  if (!sp.from.value || !sp.to.value || sp.to.value < sp.from.value) { toast('Zeitraum prüfen'); return; }
+  const n = spreadTotals({ pullups: +sp.pullups.value || 0, pushups: +sp.pushups.value || 0, km: +sp.km.value || 0, from: sp.from.value, to: sp.to.value });
+  toast(`Auf ${n} Tage verteilt`);
+  if (location.hash.includes('altstand=')) history.replaceState(null, '', location.pathname);
+});
+fillSpread();
+if (location.hash.includes('altstand=')) setTimeout(() => { show('settings'); sp.scrollIntoView({ block: 'center' }); }, 50);
+
 const bf = $('#backfill');
 bf.date.value = addDays(todayStr(), -1);
 bf.addEventListener('submit', ev => {
