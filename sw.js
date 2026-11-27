@@ -1,5 +1,5 @@
 // Offline-Cache: App-Shell zuerst aus dem Cache, im Hintergrund aktualisieren.
-const CACHE = 'sport-v0.6.0';
+const CACHE = 'sport-v0.6.1';
 const SHELL = ['./', 'index.html', 'style.css', 'app.js', 'sync.js', 'mensa.js', 'yazio.js', 'yazio-config.js', 'firebase-config.js', 'manifest.webmanifest', 'icons/icon.svg', 'icons/icon-180.png', 'icons/icon-192.png', 'icons/icon-512.png'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting())); });
 self.addEventListener('activate', e => {

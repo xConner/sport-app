@@ -10,7 +10,7 @@
   const label = s => { const [y, m, d] = s.split('-').map(Number); const t = new Date(y, m - 1, d); return `${WD[t.getDay()]} ${pad(d)}.${pad(m)}.`; };
   const eur = n => n.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' });
 
-  let data = null, mensaId = 1, day = null;
+  let data = null, mensaId = 1, day = null, wanted = null;
   try { data = JSON.parse(localStorage.getItem(KEY)); } catch {}
   try { mensaId = +(localStorage.getItem(PREF) || 1); } catch {}
 
@@ -31,7 +31,10 @@
     $('#mensasel').innerHTML = data.mensen.map(m => `<button type="button" data-id="${m.id}" class="${m.id === mensa.id ? 'on' : ''}">${esc(m.name)}</button>`).join('');
     const today = iso(new Date());
     const dates = Object.keys(mensa.tage).filter(d => d >= today);
-    if (!day || !mensa.tage[day]) day = dates[0] || null;
+    // Gewählten Tag beibehalten; hat diese Mensa an dem Tag nichts (z. B. Wochenende), nächsten Tag mit Plan nehmen,
+    // der gewählte Tag bleibt aber gemerkt, damit er beim Zurückwechseln wieder aktiv ist.
+    if (!wanted || wanted < today) wanted = dates[0] || null;
+    day = mensa.tage[wanted] ? wanted : (dates.find(d => d >= wanted) || dates[dates.length - 1] || null);
     $('#mensadays').innerHTML = dates.map(d => `<button type="button" data-day="${d}" class="${d === day ? 'on' : ''}">${d === today ? 'Heute' : label(d)}</button>`).join('');
     const upd = new Date(data.updated);
     $('#mensaupd').textContent = `Stand ${pad(upd.getDate())}.${pad(upd.getMonth() + 1)}. ${pad(upd.getHours())}:${pad(upd.getMinutes())}`;
@@ -46,9 +49,9 @@
 
   document.addEventListener('click', ev => {
     const b = ev.target.closest('#mensasel button[data-id]');
-    if (b) { mensaId = +b.dataset.id; try { localStorage.setItem(PREF, mensaId); } catch {} day = null; render(); }
+    if (b) { mensaId = +b.dataset.id; try { localStorage.setItem(PREF, mensaId); } catch {} render(); }
     const d = ev.target.closest('#mensadays button[data-day]');
-    if (d) { day = d.dataset.day; render(); }
+    if (d) { wanted = d.dataset.day; render(); }
     if (ev.target.closest('.tabs button[data-view="mensa"]')) load();
   });
   render(); load();
